@@ -51,7 +51,7 @@ constructorTypesVars t = error $ "unsupported type " ++ show t
 expandSynsAndGetContextTypes :: Type -> Q [Type]
 expandSynsAndGetContextTypes t = do
                              t' <- (expandSyns t)
-                             return $ nub (constructorTypesVars t')
+                             return $ (constructorTypesVars t')
 
 third (a,b,c) = c
 
@@ -89,7 +89,7 @@ type TypeName = Name
 generateClassContext :: ClassName -> TypeName -> Q (Maybe Type)
 generateClassContext classname dataname = do
                             (tvbs, cons) <- getTyVarCons classname dataname
-                            types <- fmap concat $ mapM getContextType cons
+                            types <- fmap nub $ fmap concat $ mapM getContextType cons
                             let len = length types
                             if len == 0
                               then return Nothing
