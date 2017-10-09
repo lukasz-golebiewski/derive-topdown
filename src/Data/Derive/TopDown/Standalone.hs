@@ -31,7 +31,11 @@ genStandaloneDerivingDecl cn tn = do
                        let context = case classContext of
                                        Nothing -> []
                                        Just cc -> if isGeneric then [] else [cc]
+#if __GLASGOW_HASKELL__ >= 802
+                       let c = [StandaloneDerivD Nothing context (AppT (ConT cn) instanceType)]
+#else
                        let c = [StandaloneDerivD context (AppT (ConT cn) instanceType)]
+#endif
                        modify (instanceType:)
                        names <- lift $ fmap concat $ mapM getCompositeTypeNames cons
                        xs <- mapM (\n -> genStandaloneDerivingDecl cn n) names
