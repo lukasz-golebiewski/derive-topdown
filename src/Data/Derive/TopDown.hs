@@ -3,7 +3,7 @@
 Module      : Data.Derive.TopDown
 Description : Help Haskellers derive class instances for composited data types.
 Copyright   : (c) songzh
-License     : GPL-3
+License     : BSD3
 Maintainer  : Haskell.Zhang.Song@hotmail.com
 Stability   : experimental
 

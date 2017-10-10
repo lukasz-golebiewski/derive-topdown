@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell,ExplicitForAll,ScopedTypeVariables,StandaloneDeriving,PolyKinds,ExistentialQuantification,FlexibleContexts,UndecidableInstances #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE CPP #-}
 module Data.Derive.TopDown.Lib (isInstance', generateClassContext,getTyVarCons,getTVBName, getCompositeTypeNames, ClassName,TypeName) where
 

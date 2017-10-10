@@ -3,13 +3,13 @@
 
 name:                derive-topdown
 version:             0.0.1.0
--- synopsis:            
--- description:         
+synopsis:            Help Haskellers derive class instances for composited data types.
+description:         This package will make it easier to derive class instance for complex composited data types by using Template Haskell.
 license:             BSD3
 license-file:        LICENSE
 author:              songzh
--- maintainer:          
--- copyright:           
+maintainer:          songzh
+copyright:           (C) songzh
 category:            Development
 build-type:          Simple
 extra-source-files:  ChangeLog.md
@@ -23,7 +23,7 @@ library
                       Data.Derive.TopDown.TH
   -- other-extensions:    
   build-depends:       base >=4.8,
-                       -- need to change according to ghc 7.8, 7.10,8.0,8.2
+                       -- considered 7.10, 8.0, 8.2
                        template-haskell>=2.10,
                        -- compatible from 7.0 to 7.11
                        syb>=0.4,
@@ -32,11 +32,9 @@ library
                        -- fully compatible
                        th-expand-syns>=0.4.3,
                        -- compatible from 7.6 to 8.2
-                       -- derive>=2.6.3,
-                       -- 
                        mtl>=2.1.0,
                        --
-                       transformers>=0.5.2
+                       transformers>=0.4.2
   hs-source-dirs:      src
   default-language:    Haskell2010
   default-extensions:  TemplateHaskell,CPP
