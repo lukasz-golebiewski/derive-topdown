@@ -80,10 +80,10 @@ derivingss cns tns = fmap concat (mapM (\x -> derivings cns x) tns)
 
 
 #if __GLASGOW_HASKELL__ >= 802
-strategy_deriving:: Name
-                 -> Name
-                 -> DerivStrategy
-                 -> Q [Dec]
+strategy_deriving :: Name
+                  -> Name
+                  -> DerivStrategy
+                  -> Q [Dec]
 
 strategy_deriving cn tn st = evalStateT (genStandaloneDerivingDecl cn tn (Just st)) []
 
@@ -98,6 +98,5 @@ strategy_derivingss :: [Name]
                     -> [Name]
                     -> DerivStrategy
                     -> Q [Dec]
-
-strategy_derivingss cns tns st = fmap concat $ (mapM (\x -> strategy_derivings cns x st) cns)
+strategy_derivingss cns tns st = fmap concat $ (mapM (\x -> strategy_derivings cns x st) tns)
 #endif
