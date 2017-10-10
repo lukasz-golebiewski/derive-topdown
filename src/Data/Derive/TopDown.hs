@@ -61,9 +61,15 @@ Also, there are some data types which are impossible to be derived as instances 
 module Data.Derive.TopDown (
   module Data.Derive.TopDown.Standalone,
   module Data.Derive.TopDown.Instance,
-  module Data.Derive.TopDown.TH)
+  module Data.Derive.TopDown.TH
+#if __GLASGOW_HASKELL__ >= 802
+   ,DerivStrategy(StockStrategy,AnyclassStrategy,NewtypeStrategy)
+#endif
+  )
 where
-
+#if __GLASGOW_HASKELL__ >= 802
+import Language.Haskell.TH.Syntax
+#endif
 import Data.Derive.TopDown.Standalone
 import Data.Derive.TopDown.Instance
 import Data.Derive.TopDown.TH
