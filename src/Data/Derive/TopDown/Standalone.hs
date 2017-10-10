@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Data.Derive.TopDown.Standalone (deriving_,derivings) where
+module Data.Derive.TopDown.Standalone (deriving_, derivings, derivingss) where
 
 import Data.Derive.TopDown.Lib
 import Language.Haskell.TH
@@ -41,8 +41,17 @@ genStandaloneDerivingDecl cn tn = do
                        xs <- mapM (\n -> genStandaloneDerivingDecl cn n) names
                        return $ concat xs ++ c
 
-deriving_:: ClassName -> TypeName -> Q [Dec]
+deriving_ :: Name -- ^ class name
+          -> Name -- ^ type name
+          -> Q [Dec]
 deriving_ cn tn = evalStateT (genStandaloneDerivingDecl cn tn) []
 
-derivings :: [ClassName] -> TypeName -> Q [Dec]
-derivings cns tn = fmap concat (sequenceA $ map (\x -> deriving_ x tn) cns)
+derivings :: [Name] -- ^ class names
+          -> Name   -- ^ type name
+          -> Q [Dec]
+derivings cns tn = fmap concat (mapM (\x -> deriving_ x tn) cns)
+
+derivingss :: [Name] -- ^ class names
+           -> [Name] -- ^ type names
+           -> Q [Dec]
+derivingss cns tns = fmap concat (mapM (\x -> derivings cns x) tns)

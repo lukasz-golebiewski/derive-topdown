@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Data.Derive.TopDown.Instance (instance_, instances) where
+module Data.Derive.TopDown.Instance (instance_, instances, instancess) where
 
 import Data.Derive.TopDown.Lib
 import Language.Haskell.TH
@@ -37,8 +37,17 @@ genEmptyInstanceDecl cn tn = do
                        xs <- mapM (\n -> genEmptyInstanceDecl cn n) names
                        return $ concat xs ++ c
 
-instance_ :: ClassName -> TypeName -> Q [Dec]
+instance_ :: Name -- ^ class name
+          -> Name -- ^ type name
+          -> Q [Dec]
 instance_ cn tn = evalStateT (genEmptyInstanceDecl cn tn) []
 
-instances :: [ClassName] -> TypeName -> Q [Dec]
-instances cns tn = fmap concat (sequenceA $ map (\x -> instance_ x tn) cns)
+instances :: [Name] -- ^ class names
+          -> Name   -- ^ type name
+          -> Q [Dec]
+instances cns tn = fmap concat (mapM (\x -> instance_ x tn) cns)
+
+instancess :: [Name] -- ^ class names
+           -> [Name] -- ^ type names
+           -> Q [Dec]
+instancess cns tns = fmap concat (mapM (\x -> instances cns x) tns)

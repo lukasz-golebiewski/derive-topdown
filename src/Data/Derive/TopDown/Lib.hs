@@ -122,7 +122,3 @@ getCompositeTypeNames (InfixC st1 n st2) = expandSynsAndGetTypeNames (map snd [s
 getCompositeTypeNames (ForallC bind context con) = getCompositeTypeNames con
 getCompositeTypeNames (GadtC name bangtype resulttype) = expandSynsAndGetTypeNames (map snd bangtype)
 getCompositeTypeNames (RecGadtC name bangtypes result_type) = expandSynsAndGetTypeNames (map third bangtypes)
-
-                                   
-
-
