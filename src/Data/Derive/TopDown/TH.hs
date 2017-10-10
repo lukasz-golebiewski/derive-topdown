@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -ddump-splices #-}
 {-# LANGUAGE TemplateHaskell #-}
-module Data.Derive.TopDown.TH (derivingTH, derivingTHs, derivingTHss) where
+module Data.Derive.TopDown.TH (deriving_th, deriving_ths, deriving_thss) where
 import Data.Derive.TopDown.Lib
 
 import Language.Haskell.TH.Lib
@@ -29,17 +29,17 @@ genTH (className,deriveFunction) typeName = do
                              return $ concat decls ++ decl
 
 
-derivingTH :: (Name, Name -> Q [Dec]) -- ^ class name and corresponding isntance generation function
+deriving_th :: (Name, Name -> Q [Dec]) -- ^ class name and corresponding isntance generation function
            -> Name -- ^ type name
            -> Q [Dec]
-derivingTH cd tname = evalStateT (genTH cd tname) []
+deriving_th cd tname = evalStateT (genTH cd tname) []
 
-derivingTHs :: [(Name, Name -> Q [Dec])] -- ^ class names and corresponding instance generation functions
+deriving_ths :: [(Name, Name -> Q [Dec])] -- ^ class names and corresponding instance generation functions
             -> Name -- ^ type name
             -> Q [Dec]
-derivingTHs cds typeName = fmap concat (mapM (\c -> derivingTH c typeName) cds)
+deriving_ths cds typeName = fmap concat (mapM (\c -> deriving_th c typeName) cds)
 
-derivingTHss :: [(Name, Name -> Q [Dec])] -- ^ class names and corresponding instance generation functions
+deriving_thss :: [(Name, Name -> Q [Dec])] -- ^ class names and corresponding instance generation functions
              -> [Name] -- ^ type names
              -> Q [Dec]
-derivingTHss cds typeNames = fmap concat (mapM (\t -> derivingTHs cds t) typeNames)
+deriving_thss cds typeNames = fmap concat (mapM (\t -> deriving_ths cds t) typeNames)

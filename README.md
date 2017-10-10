@@ -55,7 +55,7 @@ For empty class instances deriving we can use it in this way.
 
 For generating instances with a template Haskell function, `derivingTHs` can be used:
 	
-	   derivingTHs
+	   deriving_ths
 	      [(''ToJSON, deriveToJSON defaultOptions),
 	       (''FromJSON, deriveFromJSON defaultOptions)]
 	      ''Company
