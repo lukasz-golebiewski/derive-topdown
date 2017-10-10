@@ -97,7 +97,7 @@ generateClassContext classname dataname = do
                               then return Nothing
                               else do
                                   -- Eq a, Eq b ...
-                                  let contexts = map (AppT (ConT classname)) types                            
+                                  let contexts = map (AppT (ConT classname)) types
                                   -- (Eq a, Eq b ...)
                                   let contextTuple = foldl1 AppT $ (TupleT len) : contexts
                                   return $ Just contextTuple
