@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell,ExplicitForAll,ScopedTypeVariables,StandaloneDeriving,PolyKinds,ExistentialQuantification,FlexibleContexts,UndecidableInstances #-}
-
+{-# LANGUAGE CPP #-}
 module Data.Derive.TopDown.Lib (isInstance', generateClassContext,getTyVarCons,getTVBName, getCompositeTypeNames, ClassName,TypeName) where
 
 import Language.Haskell.TH
@@ -38,9 +38,11 @@ constructorTypesVars c@(AppT t1 t2) = constructorTypesVars t1 ++ constructorType
 constructorTypesVars v@(VarT name) = [v]
 constructorTypesVars c@(ConT name) = []
 -- constructorTypesVars (PromotedT name) = undefined
+#if __GLASGOW_HASKELL__ > 710
 constructorTypesVars (InfixT t1 name t2) = constructorTypesVars t1 ++ constructorTypesVars t2
 constructorTypesVars (UInfixT t1 name t2) = constructorTypesVars t1 ++ constructorTypesVars t2
 constructorTypesVars (ParensT t) = constructorTypesVars t
+#endif
 constructorTypesVars (TupleT i) = []
 constructorTypesVars (ListT ) = [] 
 -- constructorTypesVars (UnboxedTupleT i) = undefined
@@ -60,24 +62,24 @@ getContextType (NormalC name bangtypes) = fmap concat $ mapM expandSynsAndGetCon
 getContextType (RecC name varbangtypes) = fmap concat $ mapM expandSynsAndGetContextTypes (map third varbangtypes)
 getContextType (InfixC bangtype1 name bangtype2) =  fmap concat $ mapM expandSynsAndGetContextTypes (map snd [bangtype1, bangtype2])
 getContextType (ForallC binding context con) = getContextType con -- is forall allowed in class instances context?
+#if __GLASGOW_HASKELL__>710
 getContextType (GadtC name bangtypes result_type) = fmap concat $ mapM expandSynsAndGetContextTypes (map snd bangtypes)
 getContextType (RecGadtC name bangtypes result_type) = fmap concat $ mapM expandSynsAndGetContextTypes (map third bangtypes)
-
-getVar :: Type -> [Type]
-getVar v@(VarT t) = [v]
-getVar v = []
-
-getAllVars :: Type -> [Type]
-getAllVars = everything (++) (mkQ [] getVar)
-
+#endif
 getTyVarCons :: ClassName -> TypeName -> Q ([TyVarBndr], [Con])
 getTyVarCons cn name = do
             info <- reify name
             case info of
               TyConI dec -> case dec of
+#if __GLASGOW_HASKELL__>710
                               DataD _ _ tvbs _ cons _  -> return (tvbs, cons)
                               NewtypeD _ _ tvbs _ con _-> return (tvbs, [con])
                               TySynD name tvbs t -> undefined
+#else
+                              DataD _ _ tvbs cons _  -> return (tvbs, cons)
+                              NewtypeD _ _ tvbs con _-> return (tvbs, [con])
+                              TySynD name tvbs t -> undefined
+#endif
                               _ -> error "not a data or newtype definition"
               _ -> error $ "cannot generate "++ show cn ++ " instances for " ++ show name
 
@@ -120,5 +122,7 @@ getCompositeTypeNames (NormalC n bts) = expandSynsAndGetTypeNames (map snd bts)
 getCompositeTypeNames (RecC n vbts) = expandSynsAndGetTypeNames (map third vbts)
 getCompositeTypeNames (InfixC st1 n st2) = expandSynsAndGetTypeNames (map snd [st1 , st2])
 getCompositeTypeNames (ForallC bind context con) = getCompositeTypeNames con
+#if __GLASGOW_HASKELL__> 710
 getCompositeTypeNames (GadtC name bangtype resulttype) = expandSynsAndGetTypeNames (map snd bangtype)
 getCompositeTypeNames (RecGadtC name bangtypes result_type) = expandSynsAndGetTypeNames (map third bangtypes)
+#endif
