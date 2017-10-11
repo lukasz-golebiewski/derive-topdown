@@ -27,7 +27,7 @@ library
                       Data.Derive.TopDown.Instance
                       Data.Derive.TopDown.TH
   -- other-extensions:    
-  build-depends:       base >=4.8,
+  build-depends:       base >=4.8 && <5.0,
                        -- considered 7.10, 8.0, 8.2
                        template-haskell>=2.10,
                        -- compatible from 7.0 to 7.11
