@@ -7,7 +7,7 @@ import Language.Haskell.TH.Syntax
 import Data.Generics (mkT,everywhere,mkQ,everything)
 import GHC.Exts
 import Language.Haskell.TH.ExpandSyns (expandSyns)
-import Data.List (nub)
+import Data.List (nub,intersect)
 
 -- This is an isInstance function with polymorphic type replaced by Any in GHC.Exts
 -- This is inspired by Ryan Scott
@@ -30,14 +30,25 @@ removeExplicitForAll t = t
 removeExplicitForAllTrans :: Type -> Type
 removeExplicitForAllTrans = everywhere (mkT removeExplicitForAll)
 
+getVarName :: Type -> [Name]
+getVarName (VarT n) = [n]
+getVarName _ = []
+
+getAllVarNames :: Type -> [Name]
+getAllVarNames = everything (++) (mkQ [] getVarName)
+
 constructorTypesVars :: Type -> [Type]
--- constructorTypesVars f@(ForallT _ _ _) = error "forall"
+-- get all free variablein a forall type expression.
+constructorTypesVars f@(ForallT tvbs _ t) = let scopedVarNames = map getTVBName tvbs in
+                                              filter (\x -> null $ intersect (getAllVarNames x) scopedVarNames)
+                                              (constructorTypesVars t)
+
 constructorTypesVars a@(AppT (VarT tvn) t2) = [a]
 constructorTypesVars c@(AppT (ConT name) t) = constructorTypesVars t
 constructorTypesVars c@(AppT t1 t2) = constructorTypesVars t1 ++ constructorTypesVars t2
 constructorTypesVars v@(VarT name) = [v]
 constructorTypesVars c@(ConT name) = []
--- constructorTypesVars (PromotedT name) = undefined
+constructorTypesVars (PromotedT name) = []
 #if __GLASGOW_HASKELL__ > 710
 constructorTypesVars (InfixT t1 name t2) = constructorTypesVars t1 ++ constructorTypesVars t2
 constructorTypesVars (UInfixT t1 name t2) = constructorTypesVars t1 ++ constructorTypesVars t2
@@ -47,6 +58,13 @@ constructorTypesVars (TupleT i) = []
 constructorTypesVars (ListT ) = [] 
 -- constructorTypesVars (UnboxedTupleT i) = undefined
 -- constructorTypesVars (UnboxedSumT t) = undefined -- ghc 8.2.1
+constructorTypesVars (EqualityT) = []
+constructorTypesVars (PromotedTupleT i) = []
+constructorTypesVars (PromotedNilT) = []
+constructorTypesVars (PromotedConsT) = []
+constructorTypesVars (LitT lit) = []
+constructorTypesVars (ConstraintT) = []
+-- constructorTypesVars (WildCardT lit) = undefined
 constructorTypesVars (ArrowT) = [ArrowT]
 constructorTypesVars t = error $ "unsupported type " ++ show t
 
@@ -57,15 +75,23 @@ expandSynsAndGetContextTypes t = do
 
 third (a,b,c) = c
 
+
+
 getContextType :: Con -> Q [Type]
 getContextType (NormalC name bangtypes) = fmap concat $ mapM expandSynsAndGetContextTypes (map snd bangtypes)
 getContextType (RecC name varbangtypes) = fmap concat $ mapM expandSynsAndGetContextTypes (map third varbangtypes)
-getContextType (InfixC bangtype1 name bangtype2) =  fmap concat $ mapM expandSynsAndGetContextTypes (map snd [bangtype1, bangtype2])
-getContextType (ForallC binding context con) = getContextType con -- is forall allowed in class instances context?
+getContextType (InfixC bangtype1 name bangtype2) = fmap concat $ mapM expandSynsAndGetContextTypes (map snd [bangtype1, bangtype2])
+-- need to remove types which contains scoped variables
+getContextType (ForallC tvbs _ con) =  let scopedVarNames = map getTVBName tvbs in
+                                         do
+                                           types <- getContextType con
+                                           let ty_vars = filter (\ty -> null $ intersect (getAllVarNames ty) scopedVarNames) types
+                                           fmap concat $ mapM expandSynsAndGetContextTypes ty_vars
 #if __GLASGOW_HASKELL__>710
 getContextType (GadtC name bangtypes result_type) = fmap concat $ mapM expandSynsAndGetContextTypes (map snd bangtypes)
 getContextType (RecGadtC name bangtypes result_type) = fmap concat $ mapM expandSynsAndGetContextTypes (map third bangtypes)
 #endif
+
 getTyVarCons :: ClassName -> TypeName -> Q ([TyVarBndr], [Con])
 getTyVarCons cn name = do
             info <- reify name
