@@ -3,10 +3,11 @@ This is a Haskell project which will derive type class instances from top for a 
 ### standalone deriving
 
 	{-# LANGUAGE StandaloneDeriving,
-		ConstraintKinds,
+		ConstraintKinds,      
 		UndecidableInstances,
-		GADTs,
-		DeriveGeneric #-}
+		-- You maybe need a lot of other extensions like FlexibleInstances and DerivingStrategies.
+		DeriveGeneric
+	#-}
 	{-# OPTIONS_GHC -ddump-splices #-}
 	
 	import Data.Derive.TopDown
@@ -44,7 +45,7 @@ You will get:
 	    deriving instance Generic (Company a_acKT)
 
 
-For empty class instances deriving we can use it in this way.
+For empty class instances deriving we can use it in this way. With DeriveAnyClasses and Generic class, we can use standalone deriving to do it. However, this is no reason to prevent you from doing this.
 
 	    instances [''Binary] ''Company
 	  ======>
@@ -81,4 +82,4 @@ For generating instances with a template Haskell function, `derivingTHs` can be 
 	        ...
 	        ...
 		
-You can use this this function with `derive`(http://hackage.haskell.org/package/derive) package.
+You can use this function with `derive`(http://hackage.haskell.org/package/derive) package. It can handle more type classes, like Arbitrary in QuickCheck, especially. 
