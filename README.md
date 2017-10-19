@@ -1,5 +1,5 @@
 # derive-topdown
-[![Hackage version](https://img.shields.io/hackage/v/derive-topdown.svg?label=Hackage)](https://hackage.haskell.org/package/derive-package) [![Stackage version](https://www.stackage.org/package/derive-topdown/badge/lts?label=Stackage)](https://www.stackage.org/package/derive-topdown)
+[![Hackage version](https://img.shields.io/hackage/v/derive-topdown.svg?label=Hackage)](https://hackage.haskell.org/package/derive-topdown) [![Stackage version](https://www.stackage.org/package/derive-topdown/badge/lts?label=Stackage)](https://www.stackage.org/package/derive-topdown)
 
 This is a Haskell project which will derive type class instances from top for a composite data type
 
