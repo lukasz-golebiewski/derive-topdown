@@ -95,7 +95,7 @@ You can use this this function with `derive`(http://hackage.haskell.org/package/
 The 3 strategies for deriving`StockStrategy`,`AnyclassStrategy`,`NewtypeStrategy` are exposed when you import `TopDown`
 
 #### **NOTE**:  About deriving instances of Typeable
-There is a bug with `isInstance` function when working with Typeable class. See (https://ghc.haskell.org/trac/ghc/ticket/11251). So I use Data type class to replace Typeable when using `isInstance`. This means that  if you used a data type from other library or module, it is an instance of `Typeable` but not an instance of `Data`, there might be errors when you try to derive `Typeable` in this top-down manner.
+There is a bug with `isInstance` function when working with Typeable class. See (https://ghc.haskell.org/trac/ghc/ticket/11251). So I use Data type class to replace Typeable when using `isInstance`. This means that  if you used a data type from other library or module, it is an instance of `Typeable` but not an instance of `Data`, there might be errors when you try to derive `Typeable` in this top-down manner. Make sure you and your data type use `Typeable` and `Data` together.
 
 #### **NOTE**: You cannot derive a type synonym. It will not work with `-XTypeSynonymInstances` language extension. The top node in the data declaration tree has to be a data or newtype.
 
