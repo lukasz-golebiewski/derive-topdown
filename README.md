@@ -11,6 +11,7 @@ There are functions named `deriving_`, `derivings`, `derivingss`. Please see the
 		ConstraintKinds,
 		UndecidableInstances,
 		GADTs,
+		TemplateHaskell,
 		DeriveGeneric #-}
 	{-# OPTIONS_GHC -ddump-splices #-}
 	
