@@ -98,7 +98,8 @@ There is a bug with `isInstance` function when working with Typeable class. See 
 
 
 #### **NOTE**:  About deriving instances of Typeable
-There is a bug with `isInstance` function when working with Typeable class. See (https://ghc.haskell.org/trac/ghc/ticket/11251). So I use Data type class to replace Typeable when using `isInstance`. This means that  if you used a data type from other library or module, it is an instance of `Typeable` but not an instance of `Data`, there might be errors when you try to derive `Typeable` in this top-down manner.
+There is a bug with `isInstance` function when working with Typeable class. See (https://ghc.haskell.org/trac/ghc/ticket/11251). So I use Data type class to replace Typeable when using `isInstance`. This means that  if you used a data type from other library or module, it is an instance of `Typeable` but not an instance of `Data`, there might be errors when you try to derive `Typeable` in this top-down manner. So make sure that you and your data use them together.
 
+#### **NOTE**: You cannot derive a type synonym. It will not work with -XTypeSynonymInstances language extension. The top node in the data declaration tree has to be a data or newtype.
 
 More discussion please see https://ghc.haskell.org/trac/ghc/ticket/10607
