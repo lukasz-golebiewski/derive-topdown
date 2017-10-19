@@ -9,13 +9,27 @@ import GHC.Exts
 import Language.Haskell.TH.ExpandSyns (expandSyns)
 import Data.List (nub,intersect)
 
--- This is an isInstance function with polymorphic type replaced by Any in GHC.Exts
+#ifdef __GLASGOW_HASKELL__
+import Data.Typeable
+import Data.Data
+#endif
+-- `isInstance` in template library does not work with polymorphic types.
+-- The follwoing is an isInstance function with polymorphic type replaced by Any in GHC.Exts so that it can work with polymorphic type.
 -- This is inspired by Ryan Scott
 -- see https://ghc.haskell.org/trac/ghc/ticket/10607
 -- isInstance will not work with Typeable.
 -- See https://ghc.haskell.org/trac/ghc/ticket/11251
+
+-- For fixing deriving Typeable problem, I use Data type calss to replace Typeable since the are always pairing with each other. So if the data type is already an instance of Typeable and not an instance of Data, this will not work.
 isInstance' :: Name -> [Type] -> Q Bool
-isInstance' className tys = isInstance className (map (removeExplicitForAllTrans. replacePolyTypeTrans) tys)
+isInstance' className tys =
+#ifdef __GLASGOW_HASKELL__
+               if className == ''Typeable
+                then
+                 isInstance' ''Data tys
+                else
+#endif
+                 isInstance className (map (removeExplicitForAllTrans. replacePolyTypeTrans) tys)
 
 replacePolyType :: Type -> Type
 replacePolyType (VarT t) = ConT ''Any
@@ -66,7 +80,7 @@ constructorTypesVars (LitT lit) = []
 constructorTypesVars (ConstraintT) = []
 -- constructorTypesVars (WildCardT lit) = undefined
 constructorTypesVars (ArrowT) = [ArrowT]
-constructorTypesVars t = error $ "unsupported type " ++ show t
+constructorTypesVars t = error $ pprint t ++ " is not support"
 
 expandSynsAndGetContextTypes :: Type -> Q [Type]
 expandSynsAndGetContextTypes t = do
@@ -74,8 +88,6 @@ expandSynsAndGetContextTypes t = do
                              return $ (constructorTypesVars t')
 
 third (a,b,c) = c
-
-
 
 getContextType :: Con -> Q [Type]
 getContextType (NormalC name bangtypes) = fmap concat $ mapM expandSynsAndGetContextTypes (map snd bangtypes)
@@ -100,13 +112,12 @@ getTyVarCons cn name = do
 #if __GLASGOW_HASKELL__>710
                               DataD _ _ tvbs _ cons _  -> return (tvbs, cons)
                               NewtypeD _ _ tvbs _ con _-> return (tvbs, [con])
-                              TySynD name tvbs t -> undefined
 #else
                               DataD _ _ tvbs cons _  -> return (tvbs, cons)
                               NewtypeD _ _ tvbs con _-> return (tvbs, [con])
-                              TySynD name tvbs t -> undefined
 #endif
-                              _ -> error "not a data or newtype definition"
+                              TySynD name tvbs t -> error $ show name ++ " is a type synonym and -XTypeSynonymInstances is not supported. If you did not derive it then This is a bug, please report this bug to the author of this package."
+                              x -> error $ pprint x ++ " is not a data or newtype definition."
               _ -> error $ "cannot generate "++ show cn ++ " instances for " ++ show name
 
 type ClassName = Name

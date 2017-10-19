@@ -1,15 +1,17 @@
 # derive-topdown
-This is a Haskell project which will derive type class instances from top for a composite data type
-### standalone deriving
+[![Hackage version](https://img.shields.io/hackage/v/derive-topdown.svg?label=Hackage)](https://hackage.haskell.org/package/derive-package) [![Stackage version](https://www.stackage.org/package/derive-topdown/badge/lts?label=Stackage)](https://www.stackage.org/package/derive-topdown)
 
-	{-# LANGUAGE
-		TemplateHaskell,
-		StandaloneDeriving,
-		ConstraintKinds,      
+This is a Haskell project which will derive type class instances from top for a composite data type
+
+
+### 1. Standalone deriving
+There are functions named `deriving_`, `derivings`, `derivingss`. Please see the API for their types.
+
+	{-# LANGUAGE StandaloneDeriving,
+		ConstraintKinds,
 		UndecidableInstances,
-		-- You maybe need a lot of other extensions like FlexibleInstances and DerivingStrategies.
-		DeriveGeneric
-	#-}
+		GADTs,
+		DeriveGeneric #-}
 	{-# OPTIONS_GHC -ddump-splices #-}
 	
 	import Data.Derive.TopDown
@@ -46,8 +48,9 @@ You will get:
 	    deriving instance Generic (Department a_acKU)
 	    deriving instance Generic (Company a_acKT)
 
+### 2. Empty Instances generation
 
-For empty class instances deriving we can use it in this way. With DeriveAnyClasses and Generic class, we can use standalone deriving to do it. However, this is no reason to prevent you from doing this.
+For empty class instances deriving, `instance_`, `instances`, `instancess` are provided. We can use it in this way.
 
 	    instances [''Binary] ''Company
 	  ======>
@@ -56,9 +59,10 @@ For empty class instances deriving we can use it in this way. With DeriveAnyClas
 	    instance Binary a_af4Z => Binary (Department a_af4Z)
 	    instance Binary a_af4Y => Binary (Company a_af4Y)
 
-For generating instances with a template Haskell function, `derivingTHs` can be used:
+### 3. Usage with Template Haskell
+For generating instances with a template Haskell function, `derivingTH`, `derivingTHs` and `derivingTHss` can be used:
 	
-	   deriving_ths
+	   derivingTHs
 	      [(''ToJSON, deriveToJSON defaultOptions),
 	       (''FromJSON, deriveFromJSON defaultOptions)]
 	      ''Company
@@ -83,5 +87,18 @@ For generating instances with a template Haskell function, `derivingTHs` can be 
 	        = \ value_amQy
 	        ...
 	        ...
-		
-You can use this function with `derive`(http://hackage.haskell.org/package/derive) package. It can handle more type classes, like Arbitrary in QuickCheck, especially. 
+You can use this this function with `derive`(http://hackage.haskell.org/package/derive) package.
+
+### 4. Deriving with strategies in GHC 8.2
+`strategy_deriving`, `strategy_derivings` and `strategy_derivingss` can be used.
+The 3 strategies for deriving`StockStrategy`,`AnyclassStrategy`,`NewtypeStrategy` are exposed when you import `TopDown`
+
+#### **NOTE**:  About deriving instances of Typeable
+There is a bug with `isInstance` function when working with Typeable class. See (https://ghc.haskell.org/trac/ghc/ticket/11251). So I use Data type class to replace Typeable when using `isInstance`. This means that  if you used a data type from other library or module, it is an instance of `Typeable` but not an instance of `Data`, there might be errors when you try to derive `Typeable` in this top-down manner.
+
+
+#### **NOTE**:  About deriving instances of Typeable
+There is a bug with `isInstance` function when working with Typeable class. See (https://ghc.haskell.org/trac/ghc/ticket/11251). So I use Data type class to replace Typeable when using `isInstance`. This means that  if you used a data type from other library or module, it is an instance of `Typeable` but not an instance of `Data`, there might be errors when you try to derive `Typeable` in this top-down manner.
+
+
+More discussion please see https://ghc.haskell.org/trac/ghc/ticket/10607
