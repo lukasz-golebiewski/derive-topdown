@@ -65,7 +65,9 @@ module Data.Derive.TopDown (
 #if __GLASGOW_HASKELL__ >= 802
    ,DerivStrategy(StockStrategy,AnyclassStrategy,NewtypeStrategy)
 #endif
+  ,stock, anyclass, newtype_
   )
+
 where
 #if __GLASGOW_HASKELL__ >= 802
 import Language.Haskell.TH.Syntax
@@ -73,3 +75,12 @@ import Language.Haskell.TH.Syntax
 import Data.Derive.TopDown.Standalone
 import Data.Derive.TopDown.Instance
 import Data.Derive.TopDown.TH
+
+#if __GLASGOW_HASKELL__ >= 802
+{-|
+@sock@ and @anyclass@ are still allow to be used as functions or arguments. See <https://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/DerivingStrategies>
+-}
+stock     = StockStrategy
+anyclass  = AnyclassStrategy
+newtype_  = NewtypeStrategy
+#endif

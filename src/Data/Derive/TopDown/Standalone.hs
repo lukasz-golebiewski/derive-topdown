@@ -17,7 +17,7 @@ import Control.Monad.Trans
 import Control.Monad.State
 import Data.List (foldl')
 import Data.Primitive.Types
-
+import System.IO.Unsafe
 
 #if __GLASGOW_HASKELL__ >= 802
 genStandaloneDerivingDecl :: ClassName -> TypeName -> Maybe DerivStrategy -> StateT [Type] Q [Dec]
@@ -35,10 +35,11 @@ genStandaloneDerivingDecl cn tn = do
                    -- 2. we have already generated it, which is kind of same with case 1
                    -- 3. for GHC.Generic, if it is a primitive type like Int, Double
                    isMember <- lift $ isInstance' cn [instanceType]              
-                   isPrimitive <-lift $ isInstance ''Prim [instanceType]
-                   let isGeneric = ''G.Generic == cn             
+                   isPrimitive <-lift $ isInstance' ''Prim [instanceType]
+                   let isGeneric = ''G.Generic == cn
                    table <- get
-                   if isMember || elem instanceType table || (isPrimitive && isGeneric)
+                   if isMember || elem instanceType table ||
+                      (isPrimitive && isGeneric) || (cn == ''G.Generic && tn == ''Integer)
                      then return []
                      else do
                        let context = case classContext of
@@ -80,23 +81,23 @@ derivingss cns tns = fmap concat (mapM (\x -> derivings cns x) tns)
 
 
 #if __GLASGOW_HASKELL__ >= 802
-strategy_deriving :: Name
+strategy_deriving :: DerivStrategy
                   -> Name
-                  -> DerivStrategy
+                  -> Name
                   -> Q [Dec]
 
-strategy_deriving cn tn st = evalStateT (genStandaloneDerivingDecl cn tn (Just st)) []
+strategy_deriving st cn tn = evalStateT (genStandaloneDerivingDecl cn tn (Just st)) []
 
-strategy_derivings :: [Name]
+strategy_derivings :: DerivStrategy
+                   -> [Name]
                    -> Name
-                   -> DerivStrategy
                    -> Q [Dec]
 
-strategy_derivings cns tn st = fmap concat $ (mapM (\x -> strategy_deriving x tn st) cns)
+strategy_derivings st cns tn = fmap concat $ (mapM (\x -> strategy_deriving st x tn) cns)
 
-strategy_derivingss :: [Name]
+strategy_derivingss :: DerivStrategy
                     -> [Name]
-                    -> DerivStrategy
+                    -> [Name]
                     -> Q [Dec]
-strategy_derivingss cns tns st = fmap concat $ (mapM (\x -> strategy_derivings cns x st) tns)
+strategy_derivingss st cns tns = fmap concat $ (mapM (\x -> strategy_derivings st cns x) tns)
 #endif
