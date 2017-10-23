@@ -12,6 +12,7 @@ import Data.Binary
 import Language.Haskell.TH
 import Language.Haskell.TH.Syntax hiding (Module)
 import Language.Haskell.Syntax
+import Language.Haskell.Pretty
 import Data.Ratio
 import Text.Show.Functions
 
@@ -134,8 +135,11 @@ data TForall2 a = TF1 (forall b . b -> b) a
 
 deriving_ ''Show ''TForall2
 
+-- Phantom
+data P1 a = P1C1 (P2 a)
+data P2 b = P2C1 Int
 
+deriving_ ''Show ''P1
 
--- 
 main = putStrLn "Test passed"
 
