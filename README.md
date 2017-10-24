@@ -88,15 +88,16 @@ For generating instances with a template Haskell function, `derivingTH`, `derivi
 	        = \ value_amQy
 	        ...
 	        ...
-You can use this this function with `derive`(http://hackage.haskell.org/package/derive) package.
+You can use this this function with [`derive`](http://hackage.haskell.org/package/derive) package.
 
 ### 4. Deriving with strategies in GHC 8.2
-`strategy_deriving`, `strategy_derivings` and `strategy_derivingss` can be used.
-The 3 strategies for deriving`StockStrategy`,`AnyclassStrategy`,`NewtypeStrategy` are exposed when you import `TopDown`
+If you want to specify the strategy for deriving mechanism then `strategy_deriving`, `strategy_derivings` and `strategy_derivingss` can be used.
+The 3 strategies for deriving `StockStrategy`,`AnyclassStrategy`,`NewtypeStrategy` are exposed when you import `TopDown`. They can be write as `stock`, `anyclass` as the default grammar. For `newtype`, you can write it as `newtype_` since there is a clison with `newtype` for data declaration. Please see [DerivingStrategies](https://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/DerivingStrategies)
 
 #### **NOTE**:  About deriving instances of Typeable
-There is a bug with `isInstance` function when working with Typeable class. See (https://ghc.haskell.org/trac/ghc/ticket/11251). So I use Data type class to replace Typeable when using `isInstance`. This means that  if you used a data type from other library or module, it is an instance of `Typeable` but not an instance of `Data`, there might be errors when you try to derive `Typeable` in this top-down manner. Make sure you and your data type use `Typeable` and `Data` together.
+There is a bug with `isInstance` function when working with Typeable class. See [`ticket #11251`](https://ghc.haskell.org/trac/ghc/ticket/11251). So I use Data type class to replace Typeable when using `isInstance`. This means that  if you used a data type from other library or module, it is an instance of `Typeable` but not an instance of `Data`, there might be errors when you try to derive `Typeable` in this top-down manner. Make sure you and your data type use `Typeable` and `Data` together.
 
-#### **NOTE**: You cannot derive a type synonym. It will not work with `-XTypeSynonymInstances` language extension. The top node in the data declaration tree has to be a data or newtype.
+#### **NOTE**: You cannot derive a type synonym.
+It will not work with `-XTypeSynonymInstances` language extension. The top node in the data declaration tree has to be a data or newtype.
 
-More discussion please see https://ghc.haskell.org/trac/ghc/ticket/10607
+More discussion about `derive-topdown`, please see [`ticket #10607`](https://ghc.haskell.org/trac/ghc/ticket/10607)
