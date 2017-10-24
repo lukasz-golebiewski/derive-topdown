@@ -1,6 +1,17 @@
 derive-topdown
 ======
 
+derive-topdown-0.0.0.9
+--------------
+- `0.0.0.9` 
+    * Changed API for `strategy_derivng(s)`. Deriving strategy should be specified first as the default grammar of `deriving`.
+    * Provided `deriving_with_breaks` function so that one can specify the types that prevent further standalone deriving declarations from generating process. This is mainly for `Generic` class. See the test of deriving `Generic` for `HsModule`.
+    * Fixed Strategy deriving problem. Deriving with NewtypeStrategy on data type defined by `data` keyword will be ignored.
+    * Fixed problem with class context generation for phantom types. Phantom types will not be in the context now.
+    * Fixed `ArrowT` problem. It should be not a type variable and should appear in the context.
+    * Handled data constructor which contains explicit `forall`.
+    * Added test. It generates class instances for data types in `template-haskell` and `haskell-src`.
+
 derive-topdown-0.0.0.7
 --------------
 - `0.0.0.7` is a more carefully implemented version of derive-topdown.

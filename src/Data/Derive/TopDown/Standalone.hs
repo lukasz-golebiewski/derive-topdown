@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell  #-}
 module Data.Derive.TopDown.Standalone (
   deriving_, derivings, derivingss, deriving_with_breaks
 #if __GLASGOW_HASKELL__ >= 802
@@ -49,7 +49,15 @@ genStandaloneDerivingDecl cn tn breaks = do
                                        Nothing -> []
                                        Just cc -> if isGeneric then [] else [cc]
 #if __GLASGOW_HASKELL__ >= 802
-                       let c = [StandaloneDerivD st context (AppT (ConT cn) instanceType)]
+                       declareType <- lift (decType tn)
+                       let standaloneD = \strategy -> [StandaloneDerivD strategy context (AppT (ConT cn) instanceType)]
+                       let c = if st == Nothing
+                                 then standaloneD Nothing
+                                 else case declareType of
+                                         Data    -> case st of
+                                               Just NewtypeStrategy -> standaloneD Nothing
+                                               _                    -> standaloneD st
+                                         _       -> standaloneD st
 #else
                        let c = [StandaloneDerivD context (AppT (ConT cn) instanceType)]
 #endif

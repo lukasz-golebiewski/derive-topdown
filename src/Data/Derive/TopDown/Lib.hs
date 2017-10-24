@@ -7,6 +7,8 @@ module Data.Derive.TopDown.Lib (
  , getCompositeTypeNames
  , ClassName
  , TypeName
+ , decType
+ , DecTyType(..)
  ) where
 
 import Language.Haskell.TH
@@ -180,6 +182,24 @@ getCompositeTypeNames (RecGadtC name bangtypes result_type) = expandSynsAndGetTy
 tvb2kind :: TyVarBndr -> Kind
 tvb2kind (PlainTV n) = StarT
 tvb2kind (KindedTV n kind) = kind 
+
+data DecTyType = Data | Newtype | TypeSyn | BuiltIn deriving (Show, Enum, Eq)
+
+decType :: Name -> Q DecTyType
+decType name = do
+         info <- reify name
+         case info of
+           TyConI dec -> case dec of
+#if __GLASGOW_HASKELL__>710
+              DataD _ _ tvbs _ cons _   -> return Data
+              NewtypeD _ _ tvbs _ con _ -> return Newtype
+#else
+              DataD _ _ tvbs cons _   -> return Data                                               
+              NewtypeD _ _ tvbs con _ -> return Newtype
+#endif
+              TySynD name tvbs t -> return TypeSyn
+           PrimTyConI name arity unlifted -> return BuiltIn
+
 
 -- A function which is not used
 getKind :: Name -> Q Kind

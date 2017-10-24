@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                derive-topdown
-version:             0.0.0.7
+version:             0.0.0.9
 synopsis:            Help Haskellers derive class instances for composited data types.
 description:         This package will make it easier to derive class instance for complex composited data types by using Template Haskell.
 license:             BSD3
@@ -62,3 +62,4 @@ test-suite derive-topdown-test
                 haskell-src>=1.0.2.0
                 
   default-extensions:  TemplateHaskell,CPP
+  default-language:    Haskell2010
