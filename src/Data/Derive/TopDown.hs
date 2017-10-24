@@ -54,7 +54,9 @@ It cannot be derived 'FromJSON' and 'ToJSON' with 'deriveFromJSON' and 'deriveTo
 
 Also, there are some data types which are impossible to be derived as instances of a certain type class. For example, Word cannot be derived as Functor or Generic. Using @derive-topdown@ is the same with hand-written code, so it is your responsiblity to make that right.
 
-* __NOTE!__ @derive-topdown@ works with 'Typeable' type class, 'Typeable' and 'Data' are recommanded to be derive together otherwise there might be problems. See README and [here](https://ghc.haskell.org/trac/ghc/ticket/11251). 'deriving_with_breaks' may partially solve this problem.
+* __NOTE!__ @derive-topdown@ works with 'Typeable' type class, but there might be problems. Use @(AutoDeriveTypeable) extension if you want derive @Typeable@@ class. See README and [here](https://ghc.haskell.org/trac/ghc/ticket/11251).
+
+* __NOTE!__ When derive @Generic@ type class, @derive-topdown@ will stop generation on primitive and 'Integer' types. You need to specify the types that deriving @Generic@ class can break with. See the document below.
 
 -}
 
