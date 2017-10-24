@@ -13,7 +13,7 @@ homepage:            https://github.com/HaskellZhangSong/derive-topdown
 copyright:           (C) songzh
 category:            Development
 build-type:          Simple
-extra-source-files:  ChangeLog.md
+extra-source-files:  README.md, ChangeLog.md
 cabal-version:       >=1.10
 tested-with:         GHC == 7.10.3, GHC == 8.0.2, GHC == 8.2.1                  
 source-repository head
