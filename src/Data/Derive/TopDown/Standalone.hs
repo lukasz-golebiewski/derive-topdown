@@ -82,7 +82,8 @@ deriving_ cn tn = evalStateT (genStandaloneDerivingDecl cn tn []) []
 #endif
 
 {- | This is particularly useful with 'Generic' class.
-Some types like 'Int', 'Char','Ratio', 'Complex' or other types are not 'Generic', There must be a way to stop the generation process on those types.
+
+For the types like 'Int', 'Char','Ratio', 'Complex' or other types which are not 'Generic', there must be a way to stop the generation process on those types.
 
 However, the deriving topdown function will only stop generating 'Generic' instances on primitive types and 'Integer' by default, so you do not need to break on them manually.
 
