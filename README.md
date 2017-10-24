@@ -95,9 +95,9 @@ If you want to specify the strategy for deriving mechanism then `strategy_derivi
 The 3 strategies for deriving `StockStrategy`,`AnyclassStrategy`,`NewtypeStrategy` are exposed when you import `TopDown`. They can be write as `stock`, `anyclass` as the default grammar. For `newtype`, you can write it as `newtype_` since there is a clison with `newtype` for data declaration. Please see [DerivingStrategies](https://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/DerivingStrategies)
 
 #### **NOTE**:  About deriving instances of Typeable
-There is a bug with `isInstance` function when working with Typeable class. See [`ticket #11251`](https://ghc.haskell.org/trac/ghc/ticket/11251). So I use Data type class to replace Typeable when using `isInstance`. This means that  if you used a data type from other library or module, it is an instance of `Typeable` but not an instance of `Data`, there might be errors when you try to derive `Typeable` in this top-down manner. Make sure you and your data type use `Typeable` and `Data` together.
+There is a bug with `isInstance` function when working with Typeable class. See [`ticket #11251`](https://ghc.haskell.org/trac/ghc/ticket/11251). So there might be problems if you really want to derive `Typeable` class. However, this bug should affect you too much here since GHC now has `AutoDeriveTypeable` extension, which means you should never derive `Typeable` for manually.
 
 #### **NOTE**: You cannot derive a type synonym.
-It will not work with `-XTypeSynonymInstances` language extension. The top node in the data declaration tree has to be a data or newtype.
+`derive-topdown` will not work with `-XTypeSynonymInstances` language extension. The top node in the data declaration tree has to be a data or newtype.
 
 More discussion about `derive-topdown`, please see [`ticket #10607`](https://ghc.haskell.org/trac/ghc/ticket/10607)
