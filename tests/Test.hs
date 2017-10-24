@@ -1,4 +1,9 @@
-{-# LANGUAGE StandaloneDeriving , TemplateHaskell, DeriveGeneric, DeriveDataTypeable ,GADTs,DataKinds,ConstraintKinds,UndecidableInstances, TypeOperators,RankNTypes,GeneralizedNewtypeDeriving,DeriveAnyClass, DeriveLift,DerivingStrategies,CPP#-}
+{-# LANGUAGE StandaloneDeriving , TemplateHaskell, DeriveGeneric, DeriveDataTypeable ,GADTs,DataKinds,ConstraintKinds,UndecidableInstances, TypeOperators,RankNTypes,GeneralizedNewtypeDeriving,DeriveAnyClass, DeriveLift,CPP#-}
+
+#if __GLASGOW_HASKELL__ >= 802
+{-# LANGUAGE DerivingStrategies #-}
+#endif  
+
 {-# OPTIONS_GHC -ddump-splices #-}
 module Main where
 
@@ -12,7 +17,6 @@ import Data.Binary
 import Language.Haskell.TH
 import Language.Haskell.TH.Syntax hiding (Module)
 import Language.Haskell.Syntax
-import Language.Haskell.Pretty
 import Data.Ratio
 import Text.Show.Functions
 
@@ -67,8 +71,12 @@ data DataQL a where
   Exclude :: [DataQL G0] -> DataQL G1 -> DataQL G0
   Fixed   :: [DataQL G0] -> DataQL G1 -> DataQL G0
 
-derivings [''Show,''Eq,''Ord] ''DataQL
+-- deriving_with_breaks ''Show ''DataQL [''G0]
 
+-- Only for GHC 8.2. Some problems are with GHC 8.0
+#if __GLASGOW_HASKELL__ >= 802
+deriving_ ''Show ''DataQL
+#endif
 -- Data types with higher kinds
 data T1 k a b = T11 (k a) b | T12 (k (k a)) a b String
 
@@ -96,8 +104,6 @@ deriving_ ''Show ''T4
 deriving_th (''Arbitrary, derive makeArbitrary) ''Company
 
 
-deriving_ ''Binary ''Info
-
 -- Cannot do it
 -- deriving_th (''Arbitrary, derive makeArbitrary) ''DataQL
 
@@ -116,11 +122,14 @@ deriving_th (''Arbitrary, derive makeArbitrary) ''HsModule
 
 -- Test derive-topdown with Info type in TH
 #if __GLASGOW_HASKELL__ >= 802
-strategy_deriving NewtypeStrategy ''Binary ''OccName
+strategy_deriving newtype_ ''Binary ''OccName
 strategy_deriving anyclass ''Binary ''ModName
 strategy_deriving newtype_ ''Binary ''PkgName
-#endif
+strategy_derivings anyclass [''Binary] ''Info
+#else
 deriving_ ''Binary ''Info
+#endif
+-- deriving_ ''Binary ''Info
 
 -- Forall test
 data TForall a = TF (forall b. Show b => b) a
@@ -140,6 +149,16 @@ data P1 a = P1C1 (P2 a)
 data P2 b = P2C1 Int
 
 deriving_ ''Show ''P1
+
+-- deriving `data` keyword defined type with newtype. If the type it composed with used newtype, then it will be derived with newtype.
+data P3 a = P31C1 (NP4 Int)
+newtype  NP4 b = NP4C b
+
+#if __GLASGOW_HASKELL__ >= 802
+strategy_deriving newtype_ ''Show ''P3
+#else
+deriving_ ''Show ''P3
+#endif
 
 main = putStrLn "Test passed"
 

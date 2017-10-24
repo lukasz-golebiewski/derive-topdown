@@ -57,8 +57,8 @@ test-suite derive-topdown-test
                 syb>=0.4,
                 primitive>=0.6.2,
                 derive>=2.5.0,
-                QuickCheck>=2.10.0,
-                binary>=0.8.5.0,
+                QuickCheck>=2.8.0,
+                binary>=0.8.0.0,
                 haskell-src>=1.0.2.0
                 
   default-extensions:  TemplateHaskell,CPP

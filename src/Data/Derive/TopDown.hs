@@ -64,8 +64,8 @@ module Data.Derive.TopDown (
   module Data.Derive.TopDown.TH
 #if __GLASGOW_HASKELL__ >= 802
    ,DerivStrategy(StockStrategy,AnyclassStrategy,NewtypeStrategy)
+   ,stock, anyclass, newtype_
 #endif
-  ,stock, anyclass, newtype_
   )
 
 where
