@@ -1,5 +1,9 @@
 derive-topdown
 ======
+derive-topdown-0.0.1.0
+--------------
+- `0.0.1.0`
+    * Imporve error message.Will print the types list when type is not data or newtype defined.
 
 derive-topdown-0.0.0.9
 --------------
