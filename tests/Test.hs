@@ -22,7 +22,7 @@ import Text.Show.Functions
 import Language.SQL.SimpleSQL.Syntax
 import Data.Word
 import Text.PrettyPrint.GenericPretty
-{-
+
 -- Test for deriving strategy
 newtype A = A (Int,B)
 newtype B = B1 String
@@ -165,7 +165,7 @@ deriving_ ''Show ''P3
 data T = T Word8
 
 deriving_ ''Typeable ''Word8
--}
+
 derivings [''Out, ''Generic] ''QueryExpr
 
 
