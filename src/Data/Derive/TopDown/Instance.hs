@@ -13,7 +13,7 @@ import Data.Primitive.Types
 
 genEmptyInstanceDecl :: ClassName -> TypeName -> StateT [Type] Q [Dec]
 genEmptyInstanceDecl cn tn = do
-                   (tvbs,cons) <- lift $ getTyVarCons cn tn
+                   (tvbs,cons) <- getTyVarCons cn tn
                    classContext <- lift $ generateClassContext cn tn
                    let typeNames = map getTVBName tvbs
                    instanceType <- lift $ foldl' appT (conT tn) $ map varT typeNames

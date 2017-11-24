@@ -19,8 +19,10 @@ import Language.Haskell.TH.Syntax hiding (Module)
 import Language.Haskell.Syntax
 import Data.Ratio
 import Text.Show.Functions
-
-
+import Language.SQL.SimpleSQL.Syntax
+import Data.Word
+import Text.PrettyPrint.GenericPretty
+{-
 -- Test for deriving strategy
 newtype A = A (Int,B)
 newtype B = B1 String
@@ -159,6 +161,13 @@ strategy_deriving newtype_ ''Show ''P3
 #else
 deriving_ ''Show ''P3
 #endif
+
+data T = T Word8
+
+deriving_ ''Typeable ''Word8
+-}
+derivings [''Out, ''Generic] ''QueryExpr
+
 
 main = putStrLn "Test passed"
 

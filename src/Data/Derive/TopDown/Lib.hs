@@ -12,12 +12,13 @@ module Data.Derive.TopDown.Lib (
  ) where
 
 import Language.Haskell.TH
-import Language.Haskell.TH.Syntax
+import Language.Haskell.TH.Syntax hiding (lift)
 import Data.Generics (mkT,everywhere,mkQ,everything)
 import GHC.Exts
 import Language.Haskell.TH.ExpandSyns (expandSyns)
 import Data.List (nub,intersect,foldr1)
-
+import Control.Monad.State
+import Control.Monad.Trans
 #ifdef __GLASGOW_HASKELL__
 import Data.Typeable
 import Data.Data
@@ -116,9 +117,9 @@ getContextType name2role (GadtC name bangtypes result_type) = fmap concat $ mapM
 getContextType name2role (RecGadtC name bangtypes result_type) = fmap concat $ mapM (expandSynsAndGetContextTypes name2role) (map third bangtypes)
 #endif
 
-getTyVarCons :: ClassName -> TypeName -> Q ([TyVarBndr], [Con])
+getTyVarCons :: ClassName -> TypeName -> StateT [Type] Q ([TyVarBndr], [Con])
 getTyVarCons cn name = do
-            info <- reify name
+            info <- lift $ reify name
             case info of
               TyConI dec -> case dec of
 #if __GLASGOW_HASKELL__>710
@@ -129,7 +130,9 @@ getTyVarCons cn name = do
                               NewtypeD _ _ tvbs con _-> return (tvbs, [con])
 #endif
                               TySynD name tvbs t -> error $ show name ++ " is a type synonym and -XTypeSynonymInstances is not supported. If you did not derive it then This is a bug, please report this bug to the author of this package."
-                              x -> error $ pprint x ++ " is not a data or newtype definition."
+                              x -> do
+                                 tys <- get
+                                 error $ pprint x ++ " is not a data or newtype definition. " ++ show "Stack: " ++ show tys
               _ -> error $ "Cannot generate "++ show cn ++ " instances for " ++ show name
 
 type ClassName = Name
@@ -139,7 +142,7 @@ type TypeName = Name
 -- See https://ghc.haskell.org/trac/ghc/ticket/13324
 generateClassContext :: ClassName -> TypeName -> Q (Maybe Type)
 generateClassContext classname typename = do
-                            (tvbs, cons) <- getTyVarCons classname typename
+                            (tvbs, cons) <- (evalStateT $ getTyVarCons classname typename) []
                             -- Need to remove phantom types
                             roles <- reifyRoles typename
                             let varName2Role = zip (map getTVBName tvbs) roles
