@@ -9,6 +9,7 @@ module Data.Derive.TopDown.Lib (
  , TypeName
  , decType
  , DecTyType(..)
+ ,getTypeConstructor
  ) where
 
 import Language.Haskell.TH
@@ -230,3 +231,6 @@ getKind name = do
                                                 0 -> return StarT
                                                 n -> return (foldr1 (\x y -> AppT (AppT ArrowT x) y) (replicate arity StarT))
 
+getTypeConstructor :: Type -> Type
+getTypeConstructor (AppT a1 a2) = getTypeConstructor a1
+getTypeConstructor a = a

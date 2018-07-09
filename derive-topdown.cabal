@@ -21,7 +21,8 @@ source-repository head
   location: git://github.com/HaskellZhangSong/derive-topdown.git
                      
 library
-  exposed-modules:    Data.Derive.TopDown
+  exposed-modules:    Data.Derive.TopDown,
+                      Data.Derive.Superclass
   other-modules:      Data.Derive.TopDown.Lib,
                       Data.Derive.TopDown.Standalone,
                       Data.Derive.TopDown.Instance
