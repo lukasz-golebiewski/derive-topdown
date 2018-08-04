@@ -7,8 +7,11 @@ License     : BSD3
 Maintainer  : Haskell.Zhang.Song@hotmail.com
 Stability   : experimental
 
-The class dependencies can be very complex sometimes, such as numeric and monadic classes. This module will derive the class instance you specify with all the super class instances of it. 
-You may need to enable GHC options @-ddump-splices@. 
+Class dependencies can be complex sometimes, such as numeric and monadic classes. Making instances of them can be very tedious. Functoins in this module will help you derive the specified class instance with all the superclass instances of it.  For using this module, you may need to enable the following langauge extensions: @TemplateHaskell@, @StandaloneDeriving@, @DeriveGeneric@, @DeriveDataTypeable@, @GeneralizedNewtypeDeriving@, @DeriveAnyClass@
+
+You may also need to enable GHC options @-ddump-splices@. 
+
+For example:
 
 > data A = A
 > deriving_superclasses ''Ord ''A
@@ -19,6 +22,8 @@ You wil get:
 >  ======>
 >    deriving instance Ord A
 >    deriving instance Eq A
+
+'Eq' is automatically derived when 'Ord' is derived, since 'Eq' is a superclass of 'Ord'
 
 > newtype IO_ a = IO_ (IO a)
 > strategy_deriving_superclasses newtype_ ''MonadIO ''IO_ 
@@ -35,7 +40,7 @@ You will get:
 Appearently, @Functor f => Applicative f => Monad f => MonadIO f@
 
 > newtype F32 = F32 Float
-> strategy_deriving_superclasses newtype_ ''RealFloat ''F32
+> newtype_deriving_superclasses ''RealFloat ''F32
 
 You will get:
 
@@ -97,9 +102,10 @@ strategy_deriving_superclasses st cn tn = do
                             a <- evalStateT (deriving_superclasses' (Just st) cn tn) []
                             return a
 
+-- |Use newtype strategy to derivng all the superclass instances.
 newtype_deriving_superclasses = strategy_deriving_superclasses NewtypeStrategy
 
--- |Abbreviation for @newtype_deriving_superclasses@
+-- |Abbreviation for @newtype_deriving_superclasses@.
 gnds = newtype_deriving_superclasses
 #endif
 

@@ -8,7 +8,11 @@ Maintainer  : Haskell.Zhang.Song@hotmail.com
 Stability   : experimental
 
 
-@derive-topdown@ will make it easier to derive class instance for complex composited data types by using Template Haskell. For example:
+@derive-topdown@ will make it easier to derive class instance for complex composited data types by using Template Haskell. For using this module, you may need to enable the following langauge extensions: @TemplateHaskell@, @StandaloneDeriving@, @DeriveGeneric@, @DeriveDataTypeable@, @GeneralizedNewtypeDeriving@,@ DeriveAnyClass@.
+
+You may also need to enable GHC options @-ddump-splices@. 
+
+For example:
 
 > data Gender = Male | Female
 > type Age = Int
