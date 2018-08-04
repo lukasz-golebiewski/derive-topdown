@@ -22,6 +22,8 @@ import Text.Show.Functions
 import Language.SQL.SimpleSQL.Syntax
 import Data.Word
 import Text.PrettyPrint.GenericPretty
+import Data.Derive.Superclass
+import Control.Monad.IO.Class
 
 -- Test for deriving strategy
 newtype A = A (Int,B)
@@ -168,6 +170,19 @@ deriving_ ''Typeable ''Word8
 
 derivings [''Out, ''Generic] ''QueryExpr
 
+-- Test for deriving super classes
+
+newtype IO_ a = IO_ (IO a)
+
+strategy_deriving_superclasses newtype_ ''MonadIO ''IO_ 
+
+newtype F32 = F32 Float
+
+strategy_deriving_superclasses newtype_ ''RealFloat ''F32
+
+data A = A
+
+deriving_superclasses ''Ord ''A
 
 main = putStrLn "Test passed"
 
