@@ -102,7 +102,7 @@ strategy_deriving_superclasses st cn tn = do
                             a <- evalStateT (deriving_superclasses' (Just st) cn tn) []
                             return a
 
--- |Use newtype strategy to derivng all the superclass instances.
+-- |Use newtype strategy to derive all the superclass instances.
 newtype_deriving_superclasses = strategy_deriving_superclasses NewtypeStrategy
 
 -- |Abbreviation for @newtype_deriving_superclasses@.
