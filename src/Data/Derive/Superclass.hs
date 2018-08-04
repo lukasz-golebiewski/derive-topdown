@@ -1,8 +1,64 @@
+{-|
+
+Module      : Data.Derive.TopDown
+Description : Help Haskellers derive class instances for composited data types.
+Copyright   : (c) songzh
+License     : BSD3
+Maintainer  : Haskell.Zhang.Song@hotmail.com
+Stability   : experimental
+
+The class dependencies can be very complex sometimes, such as numeric and monadic classes. This module will derive the class instance you specify with all the super class instances of it. 
+You may need to enable GHC options @-ddump-splices@. 
+
+> data A = A
+> deriving_superclasses ''Ord ''A
+
+You wil get:
+
+>    deriving_superclasses ''Ord ''A
+>  ======>
+>    deriving instance Ord A
+>    deriving instance Eq A
+
+> newtype IO_ a = IO_ (IO a)
+> strategy_deriving_superclasses newtype_ ''MonadIO ''IO_ 
+
+You will get:
+
+>    strategy_deriving_superclasses newtype_ ''MonadIO ''IO_
+>  ======>
+>    deriving newtype instance MonadIO IO_
+>    deriving newtype instance Monad IO_
+>    deriving newtype instance Applicative IO_
+>    deriving newtype instance Functor IO_
+
+Appearently, @Functor f => Applicative f => Monad f => MonadIO f@
+
+> newtype F32 = F32 Float
+> strategy_deriving_superclasses newtype_ ''RealFloat ''F32
+
+You will get:
+
+>    strategy_deriving_superclasses newtype_ ''RealFloat ''F32
+>  ======>
+>    deriving newtype instance RealFloat F32
+>    deriving newtype instance RealFrac F32
+>    deriving newtype instance Real F32
+>    deriving newtype instance Num F32
+>    deriving newtype instance Ord F32
+>    deriving newtype instance Eq F32
+>    deriving newtype instance Fractional F32
+>    deriving newtype instance Floating F32
+
+Some of these examples are from [#13668](https://ghc.haskell.org/trac/ghc/ticket/13668).
+-}
+
 module Data.Derive.Superclass 
        (deriving_superclasses,
 #if __GLASGOW_HASKELL__ >= 802        
         strategy_deriving_superclasses,
-        newtype_deriving_superclasses
+        newtype_deriving_superclasses,
+        gnds
 #endif
         )where
 
@@ -33,7 +89,6 @@ isHigherOrderClass ty = do
 deriving_superclasses :: Name -> Name -> Q [Dec]
 deriving_superclasses cn tn = do
                             a <- evalStateT (deriving_superclasses' Nothing cn tn) []
-                            traceM $ show a
                             return a
 
 #if __GLASGOW_HASKELL__ >= 802
@@ -43,6 +98,9 @@ strategy_deriving_superclasses st cn tn = do
                             return a
 
 newtype_deriving_superclasses = strategy_deriving_superclasses NewtypeStrategy
+
+-- |Abbreviation for @newtype_deriving_superclasses@
+gnds = newtype_deriving_superclasses
 #endif
 
 #if __GLASGOW_HASKELL__ >= 802
