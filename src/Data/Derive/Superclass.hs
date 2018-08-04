@@ -44,7 +44,7 @@ Appearently, @Functor f => Applicative f => Monad f => MonadIO f@
 
 You will get:
 
->    strategy_deriving_superclasses newtype_ ''RealFloat ''F32
+>    newtype_deriving_superclasses ''RealFloat ''F32
 >  ======>
 >    deriving newtype instance RealFloat F32
 >    deriving newtype instance RealFrac F32
