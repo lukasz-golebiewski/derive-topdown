@@ -178,11 +178,11 @@ strategy_deriving_superclasses newtype_ ''MonadIO ''IO_
 
 newtype F32 = F32 Float
 
-strategy_deriving_superclasses newtype_ ''RealFloat ''F32
+newtype_deriving_superclasses ''RealFloat ''F32
 
-data A = A
+data E = E
 
-deriving_superclasses ''Ord ''A
+deriving_superclasses ''Ord ''E
 
 main = putStrLn "Test passed"
 
