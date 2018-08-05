@@ -91,7 +91,7 @@ For generating instances with a template Haskell function, `derivingTH`, `derivi
 You can use this this function with [`derive`](http://hackage.haskell.org/package/derive) package.
 
 ### 4. Deriving the superclasses
-@Data.Derive.Superclass@ provides `deriving_superclasses`, `strategy_deriving_superclasses` and newtype_deriving_superclasses, gnds can be used to derive class instance and its superclass instances. 
+`Data.Derive.Superclass` provides `deriving_superclasses`, `strategy_deriving_superclasses` and newtype_deriving_superclasses, gnds can be used to derive class instance and its superclass instances. 
 
 For example:
 
