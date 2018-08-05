@@ -90,9 +90,26 @@ For generating instances with a template Haskell function, `derivingTH`, `derivi
 	        ...
 You can use this this function with [`derive`](http://hackage.haskell.org/package/derive) package.
 
-### 4. Deriving with strategies in GHC 8.2
+### 4. Deriving the superclasses
+@Data.Derive.Superclass@ provides `deriving_superclasses`, `strategy_deriving_superclasses` and newtype_deriving_superclasses, gnds can be used to derive class instance and its superclass instances. 
+
+For example:
+
+	    data A = A
+	    deriving_superclasses ''Ord ''A
+
+You wil get:
+
+	    deriving_superclasses ''Ord ''A
+	  ======>
+	    deriving instance Ord A
+	    deriving instance Eq A
+
+
+### 5. Deriving with strategies in GHC 8.2
 If you want to specify the strategy for deriving mechanism then `strategy_deriving`, `strategy_derivings` and `strategy_derivingss` can be used.
 The 3 strategies for deriving `StockStrategy`,`AnyclassStrategy`,`NewtypeStrategy` are exposed when you import `TopDown`. They can be written as `stock`, `anyclass` as the default grammar. For `newtype`, you can write it as `newtype_` since there is a clison with `newtype` for data declaration. Please see [DerivingStrategies](https://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/DerivingStrategies)
+
 
 #### **NOTE**:  About deriving instances of Typeable
 There is a bug with `isInstance` function when working with Typeable class. See [`ticket #11251`](https://ghc.haskell.org/trac/ghc/ticket/11251). So there might be problems if you really want to derive `Typeable` class. However, this bug should affect you too much here since GHC now has `AutoDeriveTypeable` extension, which means you should never derive `Typeable` manually.
