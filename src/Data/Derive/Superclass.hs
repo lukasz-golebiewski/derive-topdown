@@ -55,7 +55,7 @@ You will get:
 >    deriving newtype instance Fractional F32
 >    deriving newtype instance Floating F32
 
-Some of these examples are from [#13668](https://ghc.haskell.org/trac/ghc/ticket/13668).
+Some of these examples are from [#13368](https://ghc.haskell.org/trac/ghc/ticket/13368).
 -}
 
 module Data.Derive.Superclass 

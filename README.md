@@ -88,7 +88,7 @@ For generating instances with a template Haskell function, `derivingTH`, `derivi
 	        = \ value_amQy
 	        ...
 	        ...
-You can use this this function with [`derive`](http://hackage.haskell.org/package/derive) package.
+You can use this this function with [`derive`](http://hackage.haskell.org/package/derive) package. However, it seems that this package is broken with GHC >= 802.
 
 ### 4. Deriving the superclasses
 `Data.Derive.Superclass` provides `deriving_superclasses`, `strategy_deriving_superclasses` and newtype_deriving_superclasses, gnds can be used to derive class instance and its superclass instances. 
@@ -112,7 +112,7 @@ The 3 strategies for deriving `StockStrategy`,`AnyclassStrategy`,`NewtypeStrateg
 
 
 #### **NOTE**:  About deriving instances of Typeable
-There is a bug with `isInstance` function when working with Typeable class. See [`ticket #11251`](https://ghc.haskell.org/trac/ghc/ticket/11251). So there might be problems if you really want to derive `Typeable` class. However, this bug should affect you too much here since GHC now has `AutoDeriveTypeable` extension, which means you should never derive `Typeable` manually.
+There is a bug with `isInstance` function when working with Typeable class. See [`ticket #11251`](https://ghc.haskell.org/trac/ghc/ticket/11251). So there might be problems if you really want to derive `Typeable` class. However, this bug should not affect you too much here since GHC now has `AutoDeriveTypeable` extension, which means you should never derive `Typeable` manually.
 
 #### **NOTE**: You cannot derive a type synonym.
 `derive-topdown` will not work with `-XTypeSynonymInstances` language extension. The top node in the data declaration tree has to be a data or newtype.
