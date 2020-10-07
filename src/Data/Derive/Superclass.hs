@@ -93,7 +93,11 @@ isHigherOrderClass ty = do
 
 deriving_superclasses :: Name -> Name -> Q [Dec]
 deriving_superclasses cn tn = do
-                            a <- evalStateT (deriving_superclasses' Nothing cn tn) []
+                            a <- evalStateT (deriving_superclasses' 
+#if __GLASGOW_HASKELL__ >= 802
+                                             Nothing 
+#endif                            
+                                             cn tn) []
                             return a
 
 #if __GLASGOW_HASKELL__ >= 802
