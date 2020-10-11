@@ -1,5 +1,5 @@
+{-# LANGUAGE CPP             #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE CPP #-}
 module Data.Derive.TopDown.Lib (
   isInstance'
  , generateClassContext
@@ -12,17 +12,18 @@ module Data.Derive.TopDown.Lib (
  ,getTypeConstructor
  ) where
 
-import Language.Haskell.TH
-import Language.Haskell.TH.Syntax hiding (lift)
-import Data.Generics (mkT,everywhere,mkQ,everything)
-import GHC.Exts
-import Language.Haskell.TH.ExpandSyns (expandSyns)
-import Data.List (nub,intersect,foldr1)
-import Control.Monad.State
-import Control.Monad.Trans
+import           Control.Monad.State
+import           Control.Monad.Trans
+import           Data.Generics                  (everything, everywhere, mkQ,
+                                                 mkT)
+import           Data.List                      (foldr1, intersect, nub)
+import           GHC.Exts
+import           Language.Haskell.TH
+import           Language.Haskell.TH.ExpandSyns (expandSyns)
+import           Language.Haskell.TH.Syntax     hiding (lift)
 #ifdef __GLASGOW_HASKELL__
-import Data.Typeable
-import Data.Data
+import           Data.Data
+import           Data.Typeable
 #endif
 -- `isInstance` in template library does not work with polymorphic types.
 -- The follwoing is an isInstance function with polymorphic type replaced by Any in GHC.Exts so that it can work with polymorphic type.
@@ -45,20 +46,20 @@ isInstance' className tys =
 
 replacePolyType :: Type -> Type
 replacePolyType (VarT t) = ConT ''Any
-replacePolyType x = x
+replacePolyType x        = x
 
 replacePolyTypeTrans = everywhere (mkT replacePolyType)
 
 removeExplicitForAll :: Type -> Type
 removeExplicitForAll (ForallT _ _ t) = t
-removeExplicitForAll t = t
+removeExplicitForAll t               = t
 
 removeExplicitForAllTrans :: Type -> Type
 removeExplicitForAllTrans = everywhere (mkT removeExplicitForAll)
 
 getVarName :: Type -> [Name]
 getVarName (VarT n) = [n]
-getVarName _ = []
+getVarName _        = []
 
 getAllVarNames :: Type -> [Name]
 getAllVarNames = everything (++) (mkQ [] getVarName)
@@ -74,7 +75,7 @@ constructorTypesVars n2r  c@(AppT (ConT name) t) = constructorTypesVars n2r t
 constructorTypesVars n2r  c@(AppT t1 t2) = constructorTypesVars n2r  t1 ++ constructorTypesVars n2r t2
 constructorTypesVars n2r  v@(VarT name) = case lookup name n2r of
                                                Just PhantomR -> []
-                                               _ -> [v]
+                                               _             -> [v]
 constructorTypesVars n2r  c@(ConT name) = []
 constructorTypesVars n2r  (PromotedT name) = []
 #if __GLASGOW_HASKELL__ > 710
@@ -83,7 +84,7 @@ constructorTypesVars n2r  (UInfixT t1 name t2) = constructorTypesVars n2r t1 ++ 
 constructorTypesVars n2r  (ParensT t) = constructorTypesVars n2r t
 #endif
 constructorTypesVars n2r  (TupleT i) = []
-constructorTypesVars n2r  (ListT ) = [] 
+constructorTypesVars n2r  (ListT ) = []
 -- constructorTypesVars n2r  (UnboxedTupleT i) = undefined
 -- constructorTypesVars n2r  (UnboxedSumT t) = undefined -- ghc 8.2.1
 constructorTypesVars n2r  (EqualityT) = []
@@ -134,7 +135,12 @@ getTyVarCons cn name = do
                               x -> do
                                  tys <- get
                                  error $ pprint x ++ " is not a data or newtype definition. " ++ show "Stack: " ++ show tys
-              _ -> error $ "Cannot generate "++ show cn ++ " instances for " ++ show name
+              DataConI name ty pName -> case ty of
+                              ForallT tvbs _ _ -> return (tvbs, [])
+                              x -> do
+                                 tys <- get
+                                 error $ pprint x ++ " is not a data or newtype definition. " ++ show "Stack: " ++ show tys
+              other -> error $ "Cannot generate "++ show cn ++ " instances for " ++ show name ++ "Got: " <> show other
 
 type ClassName = Name
 type TypeName = Name
@@ -164,9 +170,9 @@ getTVBName (KindedTV name _) = name
 
 getTypeNames :: Type -> [Name]
 getTypeNames (ForallT tvbs cxt t) = getTypeNames t
-getTypeNames (ConT n) = [n]
-getTypeNames (AppT t1 t2) = getTypeNames t1 ++ getTypeNames t2
-getTypeNames _ = []
+getTypeNames (ConT n)             = [n]
+getTypeNames (AppT t1 t2)         = getTypeNames t1 ++ getTypeNames t2
+getTypeNames _                    = []
 
 expandSynsAndGetTypeNames :: [Type] -> Q [TypeName]
 expandSynsAndGetTypeNames ts = do
@@ -184,8 +190,8 @@ getCompositeTypeNames (RecGadtC name bangtypes result_type) = expandSynsAndGetTy
 #endif
 
 tvb2kind :: TyVarBndr -> Kind
-tvb2kind (PlainTV n) = StarT
-tvb2kind (KindedTV n kind) = kind 
+tvb2kind (PlainTV n)       = StarT
+tvb2kind (KindedTV n kind) = kind
 
 data DecTyType = Data | Newtype | TypeSyn | BuiltIn deriving (Show, Enum, Eq)
 
@@ -198,10 +204,10 @@ decType name = do
               DataD _ _ tvbs _ cons _   -> return Data
               NewtypeD _ _ tvbs _ con _ -> return Newtype
 #else
-              DataD _ _ tvbs cons _   -> return Data                                               
-              NewtypeD _ _ tvbs con _ -> return Newtype
+              DataD _ _ tvbs cons _     -> return Data
+              NewtypeD _ _ tvbs con _   -> return Newtype
 #endif
-              TySynD name tvbs t -> return TypeSyn
+              TySynD name tvbs t        -> return TypeSyn
            PrimTyConI name arity unlifted -> return BuiltIn
 
 
@@ -233,4 +239,4 @@ getKind name = do
 
 getTypeConstructor :: Type -> Type
 getTypeConstructor (AppT a1 a2) = getTypeConstructor a1
-getTypeConstructor a = a
+getTypeConstructor a            = a
